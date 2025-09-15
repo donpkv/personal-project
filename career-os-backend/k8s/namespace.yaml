@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: career-os
+  labels:
+    name: career-os
+    environment: production

@@ -1,0 +1,116 @@
+name: ✨ Feature Request
+description: Suggest an idea for this project
+title: "[FEATURE] "
+labels: ["enhancement", "feature-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! 🚀
+  
+  - type: textarea
+    id: problem
+    attributes:
+      label: Is your feature request related to a problem?
+      description: A clear and concise description of what the problem is.
+      placeholder: I'm always frustrated when...
+    validations:
+      required: false
+  
+  - type: textarea
+    id: solution
+    attributes:
+      label: Describe the solution you'd like
+      description: A clear and concise description of what you want to happen.
+    validations:
+      required: true
+  
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Describe alternatives you've considered
+      description: A clear and concise description of any alternative solutions or features you've considered.
+    validations:
+      required: false
+  
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component should this feature be added to?
+      options:
+        - Backend (Java/Spring Boot)
+        - Frontend (Next.js/React)
+        - Mobile (Flutter)
+        - AI/ML Features
+        - Social Learning
+        - Mentorship System
+        - Certification System
+        - Job Market Integration
+        - Analytics
+        - Infrastructure
+        - Documentation
+        - Other
+    validations:
+      required: true
+  
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - High (Critical for my use case)
+        - Medium (Would be nice to have)
+        - Low (Minor improvement)
+    validations:
+      required: true
+  
+  - type: textarea
+    id: user-stories
+    attributes:
+      label: User Stories
+      description: |
+        Please provide user stories that describe how this feature would be used.
+      placeholder: |
+        As a [type of user], I want [some goal] so that [some reason].
+        
+        Example:
+        As a student, I want to track my learning progress so that I can see how much I've improved.
+    validations:
+      required: false
+  
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: |
+        What needs to be implemented for this feature to be considered complete?
+      placeholder: |
+        - [ ] Requirement 1
+        - [ ] Requirement 2
+        - [ ] Requirement 3
+    validations:
+      required: false
+  
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups/Screenshots
+      description: If applicable, add mockups or screenshots to help explain your feature request.
+      placeholder: Drag and drop images here or paste them directly.
+  
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other context or screenshots about the feature request here.
+  
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our Code of Conduct
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: career-os-backend-config
+  namespace: career-os
+data:
+  application.yml: |
+    server:
+      port: 8080
+      servlet:
+        context-path: /api/v1
+    
+    spring:
+      profiles:
+        active: prod
+      
+      datasource:
+        url: jdbc:postgresql://postgres-service:5432/career_os
+        username: ${DB_USERNAME}
+        password: ${DB_PASSWORD}
+        hikari:
+          maximum-pool-size: 50
+          minimum-idle: 10
+      
+      data:
+        redis:
+          host: redis-service
+          port: 6379
+          password: ${REDIS_PASSWORD}
+      
+      kafka:
+        bootstrap-servers: kafka-service:9092
+    
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: health,info,metrics,prometheus
+      endpoint:
+        health:
+          show-details: always
+    
+    logging:
+      level:
+        com.careeros: INFO
+        org.springframework.security: WARN

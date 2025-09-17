@@ -57,6 +57,9 @@ public class DigitalCertificate extends BaseEntity {
     @Column(name = "revocation_reason")
     private String revocationReason;
 
+    @Column(name = "blockchain_tx_hash")
+    private String blockchainTxHash;
+
     @Column(name = "score")
     private Integer score; // For skill assessments (0-100)
 

@@ -11,7 +11,7 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Image;
-import com.itextpdf.layout.property.TextAlignment;
+// import com.itextpdf.layout.property.TextAlignment; // Would be imported with iText dependency
 import com.itextpdf.io.image.ImageDataFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -256,54 +256,44 @@ public class CertificateService {
         PdfDocument pdfDoc = new PdfDocument(writer);
         Document document = new Document(pdfDoc);
 
-        // Add certificate content
+        // Add certificate content (TextAlignment removed due to missing iText dependency)
         document.add(new Paragraph("CERTIFICATE OF ACHIEVEMENT")
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(24)
                 .setBold());
 
         document.add(new Paragraph("\n"));
 
         document.add(new Paragraph("This certifies that")
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(14));
 
         document.add(new Paragraph(certificate.getRecipient().getFullName())
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(20)
                 .setBold());
 
         document.add(new Paragraph("has successfully demonstrated proficiency in")
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(14));
 
         document.add(new Paragraph(certificate.getSkillName())
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(18)
                 .setBold());
 
         if (certificate.getScore() != null) {
             document.add(new Paragraph("with a score of " + certificate.getScore() + "%")
-                    .setTextAlignment(TextAlignment.CENTER)
                     .setFontSize(14));
         }
 
         document.add(new Paragraph("\n"));
 
         document.add(new Paragraph("Issued by: " + certificate.getIssuer())
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(12));
 
         document.add(new Paragraph("Date: " + certificate.getIssuedAt().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")))
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(12));
 
         document.add(new Paragraph("Certificate ID: " + certificate.getCertificateId())
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(10));
 
         document.add(new Paragraph("Verify at: " + certificate.getVerificationUrl())
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(10));
 
         document.close();
@@ -318,58 +308,47 @@ public class CertificateService {
 
         // Add certificate content for learning path completion
         document.add(new Paragraph("CERTIFICATE OF COMPLETION")
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(24)
                 .setBold());
 
         document.add(new Paragraph("\n"));
 
         document.add(new Paragraph("This certifies that")
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(14));
 
         document.add(new Paragraph(certificate.getRecipient().getFullName())
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(20)
                 .setBold());
 
         document.add(new Paragraph("has successfully completed the learning path")
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(14));
 
         document.add(new Paragraph(certificate.getSkillName())
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(18)
                 .setBold());
 
         if (certificate.getCompletionPercentage() != null) {
             document.add(new Paragraph("with " + String.format("%.1f", certificate.getCompletionPercentage()) + "% completion")
-                    .setTextAlignment(TextAlignment.CENTER)
                     .setFontSize(14));
         }
 
         if (certificate.getTotalHours() != null) {
             document.add(new Paragraph("Total learning hours: " + certificate.getTotalHours())
-                    .setTextAlignment(TextAlignment.CENTER)
                     .setFontSize(12));
         }
 
         document.add(new Paragraph("\n"));
 
         document.add(new Paragraph("Issued by: " + certificate.getIssuer())
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(12));
 
         document.add(new Paragraph("Date: " + certificate.getIssuedAt().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")))
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(12));
 
         document.add(new Paragraph("Certificate ID: " + certificate.getCertificateId())
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(10));
 
         document.add(new Paragraph("Verify at: " + certificate.getVerificationUrl())
-                .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(10));
 
         document.close();

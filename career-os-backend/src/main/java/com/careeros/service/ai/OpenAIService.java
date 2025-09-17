@@ -352,4 +352,14 @@ public class OpenAIService {
         
         return response;
     }
+
+    /**
+     * Generate job market insights using AI
+     */
+    public String generateJobMarketInsights(com.careeros.entity.User user, java.util.List<com.careeros.entity.JobPosting> jobs, java.util.List<com.careeros.entity.UserSkill> userSkills) {
+        logger.info("Generating job market insights for user {}", user.getId());
+        
+        // In production, this would make API calls to OpenAI/Claude
+        return "Based on your skills and current market trends, here are key insights about job opportunities...";
+    }
 }

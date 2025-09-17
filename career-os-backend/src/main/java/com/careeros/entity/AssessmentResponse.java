@@ -49,6 +49,9 @@ public class AssessmentResponse extends BaseEntity {
     @Column(name = "points_earned")
     private Integer pointsEarned = 0;
 
+    @Column(name = "score")
+    private Double score;
+
     @Column(name = "time_spent_seconds")
     private Integer timeSpentSeconds = 0;
 
@@ -134,6 +137,14 @@ public class AssessmentResponse extends BaseEntity {
 
     public void setPointsEarned(Integer pointsEarned) {
         this.pointsEarned = pointsEarned;
+    }
+
+    public Double getScore() {
+        return score;
+    }
+
+    public void setScore(Double score) {
+        this.score = score;
     }
 
     public Integer getTimeSpentSeconds() {

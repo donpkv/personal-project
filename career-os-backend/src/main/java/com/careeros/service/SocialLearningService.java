@@ -262,16 +262,16 @@ public class SocialLearningService {
         if (searchQuery != null && !searchQuery.trim().isEmpty()) {
             return studyGroupRepository.findByNameContainingIgnoreCaseAndStatusAndPrivacyType(
                     searchQuery.trim(), StudyGroup.GroupStatus.ACTIVE, 
-                    StudyGroup.PrivacyType.PUBLIC, pageable);
+                    false, pageable); // false = not private (public)
         }
 
         if (category != null) {
             return studyGroupRepository.findByCategoryAndStatusAndPrivacyType(
-                    category, StudyGroup.GroupStatus.ACTIVE, StudyGroup.PrivacyType.PUBLIC, pageable);
+                    category.name(), StudyGroup.GroupStatus.ACTIVE, false, pageable);
         }
 
         return studyGroupRepository.findByStatusAndPrivacyType(
-                StudyGroup.GroupStatus.ACTIVE, StudyGroup.PrivacyType.PUBLIC, pageable);
+                StudyGroup.GroupStatus.ACTIVE, false, pageable);
     }
 
     /**
@@ -310,7 +310,7 @@ public class SocialLearningService {
                 .orElseThrow(() -> new RuntimeException("User is not a member of this group"));
 
         return postRepository.findByStudyGroupAndStatusOrderByCreatedAtDesc(
-                group, GroupPost.PostStatus.PUBLISHED, pageable);
+                group, com.careeros.repository.GroupPostRepository.PostStatus.ACTIVE, pageable);
     }
 
     /**
@@ -320,7 +320,7 @@ public class SocialLearningService {
         GroupPost post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // Check if user already liked the post
@@ -358,7 +358,7 @@ public class SocialLearningService {
         GroupStatsResponse stats = new GroupStatsResponse();
         stats.setGroupId(groupId);
         stats.setMemberCount(group.getMemberCount());
-        stats.setPostsCount(postRepository.countByStudyGroupAndStatus(group, GroupPost.PostStatus.PUBLISHED));
+        stats.setPostsCount(postRepository.countByStudyGroupAndStatus(group, com.careeros.repository.GroupPostRepository.PostStatus.ACTIVE));
         stats.setActiveMembers(membershipRepository.countActiveMembers(groupId, LocalDateTime.now().minusDays(7)));
         stats.setUserContributionScore(membership.getContributionScore());
         stats.setUserRank(calculateUserRank(groupId, userId));
@@ -383,11 +383,11 @@ public class SocialLearningService {
 
         if (postType != null) {
             return postRepository.findByStudyGroupAndPostTypeAndTitleContainingIgnoreCaseOrContentContainingIgnoreCaseAndStatus(
-                    group, postType, query, query, GroupPost.PostStatus.PUBLISHED, pageable);
+                    group, com.careeros.repository.GroupPostRepository.PostType.valueOf(postType.toUpperCase()), query, query, com.careeros.repository.GroupPostRepository.PostStatus.ACTIVE, pageable);
         }
 
         return postRepository.findByStudyGroupAndTitleContainingIgnoreCaseOrContentContainingIgnoreCaseAndStatus(
-                group, query, query, GroupPost.PostStatus.PUBLISHED, pageable);
+                group, query, query, com.careeros.repository.GroupPostRepository.PostStatus.ACTIVE, pageable);
     }
 
     /**

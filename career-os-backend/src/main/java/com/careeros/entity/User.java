@@ -62,6 +62,9 @@ public class User extends BaseEntity {
     @Column(name = "portfolio_url")
     private String portfolioUrl;
 
+    @Column(name = "location")
+    private String location;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "account_status", nullable = false)
     private AccountStatus accountStatus = AccountStatus.ACTIVE;
@@ -201,6 +204,14 @@ public class User extends BaseEntity {
 
     public void setPortfolioUrl(String portfolioUrl) {
         this.portfolioUrl = portfolioUrl;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public AccountStatus getAccountStatus() {

@@ -49,6 +49,9 @@ public class LearningPathEngineService {
     @Autowired
     private OpenAIService openAIService;
 
+    @Autowired
+    private com.careeros.repository.UserRepository userRepository;
+
     /**
      * Generate personalized learning path based on user profile and goals
      */
@@ -273,6 +276,10 @@ public class LearningPathEngineService {
                 steps.add(createStep(path, "Expert " + skillName + " Patterns", PathStep.StepType.LEARNING, stepOrder++));
                 steps.add(createStep(path, skillName + " Architecture & Design", PathStep.StepType.LEARNING, stepOrder++));
                 steps.add(createStep(path, "Master " + skillName + " Capstone", PathStep.StepType.PROJECT, stepOrder++));
+                break;
+            case EXPERT:
+                steps.add(createStep(path, "Advanced " + skillName + " Research", PathStep.StepType.LEARNING, stepOrder++));
+                steps.add(createStep(path, skillName + " Innovation Project", PathStep.StepType.PROJECT, stepOrder++));
                 break;
         }
 

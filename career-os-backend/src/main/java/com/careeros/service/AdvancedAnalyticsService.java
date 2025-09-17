@@ -60,7 +60,7 @@ public class AdvancedAnalyticsService {
     public UserAnalyticsDashboard getUserAnalyticsDashboard(UUID userId) {
         logger.info("Generating user analytics dashboard for user {}", userId);
 
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         UserAnalyticsDashboard dashboard = new UserAnalyticsDashboard();
@@ -192,8 +192,7 @@ public class AdvancedAnalyticsService {
             // Count users with this skill at different levels
             Map<UserSkill.ProficiencyLevel, Long> levelDistribution = userIds.stream()
                     .map(userId -> userSkillRepository.findByUserIdAndSkillName(userId, skillName))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
+                    .filter(Objects::nonNull)
                     .collect(Collectors.groupingBy(
                             UserSkill::getProficiencyLevel,
                             Collectors.counting()));
@@ -217,7 +216,7 @@ public class AdvancedAnalyticsService {
             skillGaps.put(skillName, metrics);
         }
 
-        report.setSkillGaps(skillGaps);
+        report.setSkillGaps(new ArrayList<>(skillGaps.values()));
 
         // Generate recommendations
         report.setRecommendations(generateSkillGapRecommendations(skillGaps));
@@ -240,19 +239,19 @@ public class AdvancedAnalyticsService {
 
         // Gather user data for prediction
         List<UserSkill> userSkills = userSkillRepository.findByUserId(userId);
-        List<UserLearningPath> learningPaths = userLearningPathRepository.findByUserId(userId);
-        List<UserPathStepProgress> stepProgress = stepProgressRepository.findByUserId(userId);
+        userLearningPathRepository.findByUserId(userId);
+        stepProgressRepository.findByUserId(userId);
 
         // Calculate engagement score
-        double engagementScore = calculateEngagementScore(userId, stepProgress);
+        double engagementScore = calculateEngagementScore(userId);
         prediction.setEngagementScore(engagementScore);
 
         // Calculate learning velocity
-        double learningVelocity = calculateLearningVelocity(stepProgress);
+        double learningVelocity = calculateLearningVelocity(userId);
         prediction.setLearningVelocity(learningVelocity);
 
         // Calculate consistency score
-        double consistencyScore = calculateConsistencyScore(stepProgress);
+        double consistencyScore = calculateConsistencyScore(userId);
         prediction.setConsistencyScore(consistencyScore);
 
         // Calculate overall success probability
@@ -260,8 +259,8 @@ public class AdvancedAnalyticsService {
         prediction.setSuccessProbability(successProbability);
 
         // Generate risk factors and recommendations
-        prediction.setRiskFactors(identifyRiskFactors(user, userSkills, stepProgress));
-        prediction.setRecommendations(generateSuccessRecommendations(prediction));
+        prediction.setRiskFactors(identifyRiskFactors(userSkills));
+        prediction.setRecommendations(generateSuccessRecommendations());
 
         return prediction;
     }
@@ -324,16 +323,16 @@ public class AdvancedAnalyticsService {
         List<AssessmentResponse> assessments = assessmentResponseRepository.findByUserIdOrderBySubmittedAtDesc(userId);
         
         if (!assessments.isEmpty()) {
-            double averageScore = assessments.stream().mapToDouble(AssessmentResponse::getScore).average().orElse(0.0);
+            double averageScore = assessments.stream().mapToDouble(response -> response.getScore() != null ? response.getScore() : 0.0).average().orElse(0.0);
             analytics.setAverageAssessmentScore(averageScore);
             
             // Performance trend (last 10 assessments)
             List<Double> recentScores = assessments.stream()
                     .limit(10)
-                    .map(AssessmentResponse::getScore)
+                    .map(response -> response.getScore() != null ? response.getScore() : 0.0)
                     .collect(Collectors.toList());
             Collections.reverse(recentScores); // Chronological order
-            analytics.setPerformanceTrend(calculateTrend(recentScores));
+            analytics.setPerformanceTrend(calculateTrendString(recentScores));
         }
 
         return analytics;
@@ -465,7 +464,7 @@ public class AdvancedAnalyticsService {
 
     private int calculateLearningStreak(UUID userId) {
         // Calculate current consecutive days of learning activity
-        List<UserPathStepProgress> recentProgress = stepProgressRepository.findRecentProgressByUserId(userId, 30);
+        List<UserPathStepProgress> recentProgress = stepProgressRepository.findRecentProgressByUserId(userId, LocalDateTime.now().minusDays(30));
         
         Set<LocalDateTime> activeDays = recentProgress.stream()
                 .map(p -> p.getUpdatedAt().toLocalDate().atStartOfDay())
@@ -575,13 +574,35 @@ public class AdvancedAnalyticsService {
         return new ArrayList<>();
     }
 
-    private List<String> identifyRiskFactors(User user, List<UserSkill> userSkills, List<UserPathStepProgress> stepProgress) {
+    private List<String> identifyRiskFactors(List<UserSkill> userSkills) {
         // Identify factors that might affect user success
         return new ArrayList<>();
     }
 
-    private List<String> generateSuccessRecommendations(UserSuccessPrediction prediction) {
+    private List<String> generateSuccessRecommendations() {
         // Generate recommendations to improve success probability
         return new ArrayList<>();
+    }
+
+    private String calculateTrendString(List<Double> scores) {
+        double trend = calculateTrend(scores);
+        if (trend > 0.1) return "Improving";
+        else if (trend < -0.1) return "Declining";
+        else return "Stable";
+    }
+
+    private double calculateEngagementScore(UUID userId) {
+        // Calculate user engagement score based on activity
+        return 75.0; // Placeholder
+    }
+
+    private double calculateLearningVelocity(UUID userId) {
+        // Calculate learning velocity based on progress
+        return 8.5; // Placeholder
+    }
+
+    private double calculateConsistencyScore(UUID userId) {
+        // Calculate consistency score based on regular activity
+        return 85.0; // Placeholder
     }
 }

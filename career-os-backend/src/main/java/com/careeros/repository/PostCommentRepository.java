@@ -153,7 +153,7 @@ public interface PostCommentRepository extends JpaRepository<PostComment, UUID> 
     /**
      * Find nested replies (replies to replies)
      */
-    @Query("WITH RECURSIVE comment_tree AS (" +
+    @Query(value = "WITH RECURSIVE comment_tree AS (" +
            "SELECT id, content, author_id, post_id, parent_comment_id, created_at, 0 as depth " +
            "FROM post_comments WHERE id = :rootCommentId " +
            "UNION ALL " +

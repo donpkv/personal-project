@@ -362,4 +362,41 @@ public class OpenAIService {
         // In production, this would make API calls to OpenAI/Claude
         return "Based on your skills and current market trends, here are key insights about job opportunities...";
     }
+
+    /**
+     * Generate mentorship match explanation
+     */
+    public String generateMentorshipMatchExplanation(com.careeros.entity.User mentee, com.careeros.dto.mentorship.MentorshipMatchResponse matchResponse, com.careeros.dto.mentorship.MentorshipMatchRequest request) {
+        logger.info("Generating mentorship match explanation for mentee {} and mentor {}", 
+                   mentee.getId(), matchResponse.getMentorId());
+        
+        try {
+            String prompt = String.format(
+                "Explain why %s would be a good mentor match for %s based on compatibility score %.2f, " +
+                "mentor's expertise areas: %s, mentee's goals: %s, and match reasons: %s. " +
+                "Provide a personalized explanation in 2-3 sentences.",
+                matchResponse.getMentorName(),
+                mentee.getFullName(),
+                matchResponse.getCompatibilityScore(),
+                String.join(", ", matchResponse.getMentorStrengths()),
+                request.getGoals() != null ? String.join(", ", request.getGoals()) : "General mentorship",
+                matchResponse.getMatchReasons() != null ? String.join(", ", matchResponse.getMatchReasons()) : "Compatibility"
+            );
+            
+            // In production, use actual OpenAI API call
+            return String.format(
+                "%s is an excellent mentor match for you with a %.0f%% compatibility score. " +
+                "Their expertise in %s aligns perfectly with your goals. " +
+                "This mentorship could significantly accelerate your professional growth.",
+                matchResponse.getMentorName(),
+                matchResponse.getCompatibilityScore() * 100,
+                matchResponse.getMentorStrengths().isEmpty() ? "various areas" : 
+                String.join(" and ", matchResponse.getMentorStrengths().subList(0, Math.min(2, matchResponse.getMentorStrengths().size())))
+            );
+            
+        } catch (Exception e) {
+            logger.error("Error generating mentorship match explanation", e);
+            return "This mentor appears to be a great match based on your profile and goals.";
+        }
+    }
 }

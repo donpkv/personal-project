@@ -195,11 +195,21 @@ public class JobMarketIntegrationService {
         insights.setTopRequiredSkills(topRequiredSkills);
 
         // Experience level distribution
-        Map<String, Integer> experienceLevels = jobPostingRepository.getExperienceLevelDistribution(jobTitle, location);
+        List<Object[]> experienceData = jobPostingRepository.getExperienceLevelDistribution(jobTitle, location);
+        Map<String, Integer> experienceLevels = experienceData.stream()
+                .collect(Collectors.toMap(
+                    row -> (String) row[0],
+                    row -> ((Number) row[1]).intValue()
+                ));
         insights.setExperienceLevelDistribution(experienceLevels);
 
         // Job type distribution (full-time, contract, etc.)
-        Map<String, Integer> jobTypes = jobPostingRepository.getJobTypeDistribution(jobTitle, location);
+        List<Object[]> jobTypeData = jobPostingRepository.getJobTypeDistribution(jobTitle, location);
+        Map<String, Integer> jobTypes = jobTypeData.stream()
+                .collect(Collectors.toMap(
+                    row -> (String) row[0],
+                    row -> ((Number) row[1]).intValue()
+                ));
         insights.setJobTypeDistribution(jobTypes);
 
         // Remote work availability
@@ -265,8 +275,12 @@ public class JobMarketIntegrationService {
                 .collect(Collectors.toList()));
 
         // Get trending roles that match user's skills
-        List<String> trendingRoles = jobPostingRepository.getTrendingRolesForSkills(
-                userSkills.stream().map(skill -> skill.getSkill().getName()).collect(Collectors.toList()));
+        List<Object[]> trendingRoleData = jobPostingRepository.getTrendingRolesForSkills(
+                userSkills.stream().map(skill -> skill.getSkill().getName()).collect(Collectors.toList()),
+                LocalDateTime.now().minusMonths(3));
+        List<String> trendingRoles = trendingRoleData.stream()
+                .map(row -> (String) row[0])
+                .collect(Collectors.toList());
         suggestions.addAll(trendingRoles.stream()
                 .limit(3)
                 .map(role -> "Explore opportunities in " + role + " - it's trending in your skill area")
@@ -411,7 +425,7 @@ public class JobMarketIntegrationService {
             return 0.5; // Default score if no skills specified
         }
         
-        List<String> requiredSkills = Arrays.asList(job.getRequiredSkills().split(","));
+        List<String> requiredSkills = job.getRequiredSkills();
         List<String> userSkillNames = userSkills.stream()
                 .map(skill -> skill.getSkill().getName().toLowerCase())
                 .collect(Collectors.toList());
@@ -460,7 +474,7 @@ public class JobMarketIntegrationService {
         // Count frequency of required skills in job postings
         for (JobPosting job : jobs) {
             if (job.getRequiredSkills() != null) {
-                Arrays.stream(job.getRequiredSkills().split(","))
+                job.getRequiredSkills().stream()
                         .map(String::trim)
                         .map(String::toLowerCase)
                         .forEach(skill -> requiredSkillFrequency.merge(skill, 1, Integer::sum));
@@ -478,6 +492,9 @@ public class JobMarketIntegrationService {
     }
 
     private List<String> getInDemandSkillsForRole(String role) {
-        return jobPostingRepository.getTopSkillsForRole(role, 10);
+        List<Object[]> skillData = jobPostingRepository.getTopSkillsForRole(role, 10);
+        return skillData.stream()
+                .map(row -> (String) row[0])
+                .collect(Collectors.toList());
     }
 }

@@ -62,18 +62,18 @@ public class MentorshipMatchingService {
 
         profile.setMentor(user);
         profile.setBio(request.getBio());
-        profile.setExpertiseAreas(String.join(",", request.getExpertiseAreas()));
-        profile.setIndustries(String.join(",", request.getIndustries()));
+        profile.setExpertiseAreas(request.getExpertiseAreas());
+        profile.setIndustries(request.getIndustries());
         profile.setYearsOfExperience(request.getYearsOfExperience());
         profile.setHourlyRate(request.getHourlyRate());
         profile.setAvailableHoursPerWeek(request.getAvailableHoursPerWeek());
-        profile.setTimeZone(request.getTimeZone());
-        profile.setLanguages(String.join(",", request.getLanguages()));
-        profile.setMentorshipStyle(request.getMentorshipStyle());
-        profile.setPreferredMenteeLevel(request.getPreferredMenteeLevel());
+        // Note: TimeZone field not implemented in MentorProfile entity yet
+        // Note: Languages field not implemented in MentorProfile entity yet
+        profile.setMentorshipStyle(MentorProfile.MentorshipStyle.valueOf(request.getMentorshipStyle().toUpperCase()));
+        profile.setPreferredMenteeLevel(MentorProfile.PreferredMenteeLevel.valueOf(request.getPreferredMenteeLevel().toUpperCase()));
         profile.setMaxMentees(request.getMaxMentees());
         profile.setIsAvailable(true);
-        profile.setStatus(MentorProfile.MentorStatus.ACTIVE);
+        // Note: Status field not implemented in MentorProfile entity yet
 
         return mentorProfileRepository.save(profile);
     }
@@ -134,7 +134,7 @@ public class MentorshipMatchingService {
 
         MentorshipRequest request = new MentorshipRequest();
         request.setMentee(mentee);
-        request.setMentor(mentor);
+        request.setMentor(mentor.getMentor());
         request.setMessage(message);
         request.setGoals(String.join(",", goals));
         request.setPreferredSchedule(preferredSchedule);
@@ -144,7 +144,7 @@ public class MentorshipMatchingService {
         MentorshipRequest savedRequest = mentorshipRequestRepository.save(request);
 
         // Send notification to mentor
-        notificationService.sendMentorshipRequestNotification(mentor.getMentor(), mentee, savedRequest);
+        notificationService.sendMentorshipRequestNotification(mentor.getMentor(), savedRequest);
 
         return savedRequest;
     }
@@ -158,7 +158,7 @@ public class MentorshipMatchingService {
         MentorshipRequest request = mentorshipRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Mentorship request not found"));
 
-        if (!request.getMentor().getMentor().getId().equals(mentorId)) {
+        if (!request.getMentor().getId().equals(mentorId)) {
             throw new RuntimeException("Unauthorized to accept this request");
         }
 
@@ -167,12 +167,15 @@ public class MentorshipMatchingService {
         mentorshipRequestRepository.save(request);
 
         // Update mentor's current mentee count
-        MentorProfile mentorProfile = request.getMentor();
-        mentorProfile.setCurrentMentees(mentorProfile.getCurrentMentees() + 1);
-        mentorProfileRepository.save(mentorProfile);
+        MentorProfile mentorProfile = mentorProfileRepository.findByMentorId(request.getMentor().getId())
+                .orElse(null);
+        if (mentorProfile != null) {
+            mentorProfile.setCurrentMentees(mentorProfile.getCurrentMentees() + 1);
+            mentorProfileRepository.save(mentorProfile);
+        }
 
         // Send notification to mentee
-        notificationService.sendMentorshipAcceptedNotification(request.getMentee(), mentorProfile.getMentor());
+        notificationService.sendMentorshipAcceptedNotification(request.getMentee(), request.getMentor());
 
         // Create initial mentorship session
         createInitialMentorshipSession(request);
@@ -187,7 +190,7 @@ public class MentorshipMatchingService {
         MentorshipRequest request = mentorshipRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Mentorship request not found"));
 
-        if (!request.getMentor().getMentor().getId().equals(mentorId)) {
+        if (!request.getMentor().getId().equals(mentorId)) {
             throw new RuntimeException("Unauthorized to decline this request");
         }
 
@@ -198,7 +201,7 @@ public class MentorshipMatchingService {
 
         // Send notification to mentee
         notificationService.sendMentorshipDeclinedNotification(request.getMentee(), 
-                mentorProfile.getMentor(), reason);
+                request.getMentor(), reason);
     }
 
     /**
@@ -334,10 +337,10 @@ public class MentorshipMatchingService {
         return Math.min(score, 1.0); // Cap at 1.0
     }
 
-    private double calculateSkillCompatibility(List<UserSkill> menteeSkills, String mentorExpertise) {
+    private double calculateSkillCompatibility(List<UserSkill> menteeSkills, List<String> mentorExpertise) {
         if (mentorExpertise == null || mentorExpertise.isEmpty()) return 0.0;
         
-        List<String> expertiseAreas = Arrays.asList(mentorExpertise.split(","));
+        List<String> expertiseAreas = mentorExpertise;
         
         long matchingSkills = menteeSkills.stream()
                 .map(skill -> skill.getSkill().getName().toLowerCase())
@@ -350,7 +353,7 @@ public class MentorshipMatchingService {
     }
 
     private double calculateExperienceMatch(List<UserSkill> menteeSkills, 
-                                          MentorProfile.MenteeLevel preferredLevel) {
+                                          MentorProfile.PreferredMenteeLevel preferredLevel) {
         if (preferredLevel == null) return 0.5;
         
         // Calculate average skill level of mentee
@@ -370,7 +373,7 @@ public class MentorshipMatchingService {
             case INTERMEDIATE -> averageLevel >= 1.5 && averageLevel <= 2.5 ? 1.0 : 
                                 Math.max(0.0, 1.0 - Math.abs(averageLevel - 2.0) / 2.0);
             case ADVANCED -> averageLevel >= 2.5 ? 1.0 : Math.max(0.0, (averageLevel - 1.0) / 1.5);
-            case ANY -> 0.8; // Good match for flexible mentors
+            case ALL_LEVELS -> 0.8; // Good match for flexible mentors
         };
     }
 
@@ -379,18 +382,19 @@ public class MentorshipMatchingService {
         return mentor.getAvailableHoursPerWeek() > 0 ? 0.8 : 0.2;
     }
 
-    private double calculateIndustryMatch(String industryPreference, String mentorIndustries) {
+    private double calculateIndustryMatch(String industryPreference, List<String> mentorIndustries) {
         if (industryPreference == null || mentorIndustries == null) return 0.5;
         
-        List<String> mentorIndustryList = Arrays.asList(mentorIndustries.split(","));
-        return mentorIndustryList.stream()
+        return mentorIndustries.stream()
                 .anyMatch(industry -> industry.toLowerCase().contains(industryPreference.toLowerCase())) ? 1.0 : 0.0;
     }
 
-    private double calculateStyleMatch(String preferredStyle, String mentorStyle) {
+    private double calculateStyleMatch(String preferredStyle, MentorProfile.MentorshipStyle mentorStyle) {
         if (preferredStyle == null || mentorStyle == null) return 0.5;
-        return preferredStyle.equalsIgnoreCase(mentorStyle) ? 1.0 : 0.3;
+        return preferredStyle.equalsIgnoreCase(mentorStyle.name()) ? 1.0 : 0.3;
     }
+
+    // Duplicate method removed - keeping the switch expression version
 
     private MentorshipMatchResponse createMatchResponse(MentorProfile mentor, double compatibilityScore, 
                                                        User mentee, MentorshipMatchRequest request) {
@@ -398,7 +402,7 @@ public class MentorshipMatchingService {
         response.setMentorId(mentor.getMentor().getId());
         response.setMentorName(mentor.getMentor().getFullName());
         response.setMentorBio(mentor.getBio());
-        response.setExpertiseAreas(Arrays.asList(mentor.getExpertiseAreas().split(",")));
+        response.setMentorStrengths(mentor.getExpertiseAreas());
         response.setYearsOfExperience(mentor.getYearsOfExperience());
         response.setHourlyRate(mentor.getHourlyRate());
         response.setAverageRating(mentor.getAverageRating());
@@ -443,7 +447,7 @@ public class MentorshipMatchingService {
 
     private void createInitialMentorshipSession(MentorshipRequest request) {
         MentorshipSession initialSession = new MentorshipSession();
-        initialSession.setMentor(request.getMentor().getMentor());
+        initialSession.setMentor(request.getMentor());
         initialSession.setMentee(request.getMentee());
         initialSession.setTopic("Initial Mentorship Meeting - Goal Setting");
         initialSession.setDurationMinutes(60);

@@ -32,7 +32,7 @@ public class SkillAssessmentService {
     private AssessmentResponseRepository responseRepository;
 
     @Autowired
-    private OpenAIService openAIService;
+    private OpenAIService openAIService; // AI service for generating insights
 
     @Autowired
     private CertificateService certificateService;
@@ -373,7 +373,14 @@ public class SkillAssessmentService {
             }
 
             assessmentResponse.setTimeSpentSeconds(response.getTimeSpentSeconds());
-            assessmentResponse.setConfidenceLevel(response.getConfidenceLevel());
+            if (response.getConfidenceLevel() != null) {
+                try {
+                    assessmentResponse.setConfidenceLevel(Integer.valueOf(response.getConfidenceLevel()));
+                } catch (NumberFormatException e) {
+                    // Default to medium confidence if invalid format
+                    assessmentResponse.setConfidenceLevel(3);
+                }
+            }
             
             responseRepository.save(assessmentResponse);
             totalAnswered++;

@@ -1,6 +1,7 @@
 package com.careeros.repository;
 
 import com.careeros.entity.GroupPost;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -175,7 +176,7 @@ public interface GroupPostRepository extends JpaRepository<GroupPost, UUID> {
     /**
      * Find posts by study group and status ordered by created date
      */
-    List<GroupPost> findByStudyGroupAndStatusOrderByCreatedAtDesc(com.careeros.entity.StudyGroup studyGroup, PostStatus status, org.springframework.data.domain.Pageable pageable);
+    Page<GroupPost> findByStudyGroupAndStatusOrderByCreatedAtDesc(com.careeros.entity.StudyGroup studyGroup, PostStatus status, org.springframework.data.domain.Pageable pageable);
 
     /**
      * Count posts by study group and status
@@ -186,9 +187,9 @@ public interface GroupPostRepository extends JpaRepository<GroupPost, UUID> {
      * Find posts by study group, post type, title/content containing and status
      */
     @Query("SELECT gp FROM GroupPost gp WHERE gp.studyGroup = :studyGroup AND gp.postType = :postType AND (LOWER(gp.title) LIKE LOWER(CONCAT('%', :title, '%')) OR LOWER(gp.content) LIKE LOWER(CONCAT('%', :content, '%'))) AND gp.status = :status")
-    List<GroupPost> findByStudyGroupAndPostTypeAndTitleContainingIgnoreCaseOrContentContainingIgnoreCaseAndStatus(
+    Page<GroupPost> findByStudyGroupAndPostTypeAndTitleContainingIgnoreCaseOrContentContainingIgnoreCaseAndStatus(
         @Param("studyGroup") com.careeros.entity.StudyGroup studyGroup, 
-        @Param("postType") PostType postType, 
+        @Param("postType") com.careeros.entity.GroupPost.PostType postType, 
         @Param("title") String title, 
         @Param("content") String content, 
         @Param("status") PostStatus status, 
@@ -198,7 +199,7 @@ public interface GroupPostRepository extends JpaRepository<GroupPost, UUID> {
      * Find posts by study group, title/content containing and status
      */
     @Query("SELECT gp FROM GroupPost gp WHERE gp.studyGroup = :studyGroup AND (LOWER(gp.title) LIKE LOWER(CONCAT('%', :title, '%')) OR LOWER(gp.content) LIKE LOWER(CONCAT('%', :content, '%'))) AND gp.status = :status")
-    List<GroupPost> findByStudyGroupAndTitleContainingIgnoreCaseOrContentContainingIgnoreCaseAndStatus(
+    Page<GroupPost> findByStudyGroupAndTitleContainingIgnoreCaseOrContentContainingIgnoreCaseAndStatus(
         @Param("studyGroup") com.careeros.entity.StudyGroup studyGroup, 
         @Param("title") String title, 
         @Param("content") String content, 

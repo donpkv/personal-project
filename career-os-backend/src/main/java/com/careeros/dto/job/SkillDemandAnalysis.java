@@ -24,4 +24,9 @@ public class SkillDemandAnalysis {
     private List<String> relatedSkills;
     private Map<String, Integer> topHiringCompanies;
     private List<String> recommendedCertifications;
+    private Map<String, Integer> skillDemandCounts;
+    private Map<String, Double> averageSalaries;
+    private Map<String, Double> skillGrowthRates;
+    private List<String> trendingSkills;
+    private List<String> highDemandSkills;
 }

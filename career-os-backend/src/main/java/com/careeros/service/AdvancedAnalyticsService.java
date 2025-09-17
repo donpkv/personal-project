@@ -230,7 +230,8 @@ public class AdvancedAnalyticsService {
     public UserSuccessPrediction predictUserSuccess(UUID userId) {
         logger.info("Generating success prediction for user {}", userId);
 
-        User user = userRepository.findById(userId)
+        // Verify user exists
+        userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         UserSuccessPrediction prediction = new UserSuccessPrediction();
@@ -305,7 +306,7 @@ public class AdvancedAnalyticsService {
 
         // Skill categories
         Map<String, Long> categoryDistribution = userSkills.stream()
-                .collect(Collectors.groupingBy(skill -> skill.getSkill().getCategory(), Collectors.counting()));
+                .collect(Collectors.groupingBy(skill -> skill.getSkill().getCategory().name(), Collectors.counting()));
         analytics.setSkillCategoryDistribution(categoryDistribution);
 
         // Recent skill improvements

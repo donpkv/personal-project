@@ -55,12 +55,16 @@ public class SocialLearningService {
         group.setName(request.getName());
         group.setDescription(request.getDescription());
         group.setCreator(creator);
-        group.setCategory(request.getCategory());
-        group.setPrivacyType(request.getPrivacyType());
+        group.setCategory(StudyGroup.GroupCategory.valueOf(request.getCategory().toUpperCase()));
+        group.setPrivacyType(StudyGroup.PrivacyType.valueOf(request.getPrivacyType().toUpperCase()));
         group.setMaxMembers(request.getMaxMembers());
         group.setCoverImageUrl(request.getCoverImageUrl());
-        group.setTags(new HashSet<>(request.getTags()));
-        group.setRules(new HashSet<>(request.getRules()));
+        group.setTags(new HashSet<String>(request.getTags() != null ? request.getTags() : new ArrayList<>()));
+        if (request.getRules() != null && !request.getRules().isEmpty()) {
+            group.setRules(new HashSet<>(request.getRules()));
+        } else {
+            group.setRules(new HashSet<>());
+        }
 
         StudyGroup savedGroup = studyGroupRepository.save(group);
 
@@ -182,7 +186,7 @@ public class SocialLearningService {
         post.setAuthor(author);
         post.setTitle(request.getTitle());
         post.setContent(request.getContent());
-        post.setPostType(request.getPostType());
+        post.setPostType(GroupPost.PostType.valueOf(request.getPostType().toUpperCase()));
         post.setIsAnonymous(request.getIsAnonymous());
         post.setCodeSnippet(request.getCodeSnippet());
         post.setCodeLanguage(request.getCodeLanguage());
@@ -383,7 +387,7 @@ public class SocialLearningService {
 
         if (postType != null) {
             return postRepository.findByStudyGroupAndPostTypeAndTitleContainingIgnoreCaseOrContentContainingIgnoreCaseAndStatus(
-                    group, com.careeros.repository.GroupPostRepository.PostType.valueOf(postType.toUpperCase()), query, query, com.careeros.repository.GroupPostRepository.PostStatus.ACTIVE, pageable);
+                    group, postType, query, query, com.careeros.repository.GroupPostRepository.PostStatus.ACTIVE, pageable);
         }
 
         return postRepository.findByStudyGroupAndTitleContainingIgnoreCaseOrContentContainingIgnoreCaseAndStatus(

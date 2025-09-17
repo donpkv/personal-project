@@ -376,4 +376,69 @@ public class NotificationService {
         logger.info("Sending mentorship session scheduled notification");
         // Implementation for notifying about scheduled sessions
     }
+
+    // Duplicate method removed - keeping the first implementation
+
+    /**
+     * Send mentorship accepted notification
+     */
+    public void sendMentorshipAcceptedNotification(User mentee, User mentor) {
+        logger.info("Sending mentorship accepted notification to mentee {}", mentee.getId());
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                Map<String, Object> templateData = new HashMap<>();
+                templateData.put("menteeName", mentee.getFullName());
+                templateData.put("mentorName", mentor.getFullName());
+                templateData.put("mentorshipUrl", baseUrl + "/mentorship/dashboard");
+
+                emailService.sendTemplateEmail(
+                    mentee.getEmail(),
+                    "Mentorship Request Accepted",
+                    "mentorship_accepted",
+                    templateData
+                );
+
+                if (pushNotificationsEnabled) {
+                    sendPushNotification(mentee, "Mentorship Accepted", 
+                        mentor.getFullName() + " has accepted your mentorship request");
+                }
+
+            } catch (Exception e) {
+                logger.error("Error sending mentorship accepted notification", e);
+            }
+        });
+    }
+
+    /**
+     * Send mentorship declined notification
+     */
+    public void sendMentorshipDeclinedNotification(User mentee, User mentor, String reason) {
+        logger.info("Sending mentorship declined notification to mentee {}", mentee.getId());
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                Map<String, Object> templateData = new HashMap<>();
+                templateData.put("menteeName", mentee.getFullName());
+                templateData.put("mentorName", mentor.getFullName());
+                templateData.put("reason", reason);
+                templateData.put("findMentorsUrl", baseUrl + "/mentors");
+
+                emailService.sendTemplateEmail(
+                    mentee.getEmail(),
+                    "Mentorship Request Declined",
+                    "mentorship_declined",
+                    templateData
+                );
+
+                if (pushNotificationsEnabled) {
+                    sendPushNotification(mentee, "Mentorship Request Declined", 
+                        mentor.getFullName() + " has declined your mentorship request");
+                }
+
+            } catch (Exception e) {
+                logger.error("Error sending mentorship declined notification", e);
+            }
+        });
+    }
 }

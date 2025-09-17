@@ -1,6 +1,7 @@
 package com.careeros.repository;
 
 import com.careeros.entity.StudyGroup;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -143,23 +144,23 @@ public interface StudyGroupRepository extends JpaRepository<StudyGroup, UUID> {
      * Find study groups by name, status and privacy type
      */
     @Query("SELECT sg FROM StudyGroup sg WHERE LOWER(sg.name) LIKE LOWER(CONCAT('%', :name, '%')) AND sg.status = :status AND sg.isPrivate = :isPrivate")
-    List<StudyGroup> findByNameContainingIgnoreCaseAndStatusAndPrivacyType(@Param("name") String name, @Param("status") GroupStatus status, @Param("isPrivate") boolean isPrivate, org.springframework.data.domain.Pageable pageable);
+    Page<StudyGroup> findByNameContainingIgnoreCaseAndStatusAndPrivacyType(@Param("name") String name, @Param("status") StudyGroup.GroupStatus status, @Param("isPrivate") boolean isPrivate, org.springframework.data.domain.Pageable pageable);
 
     /**
      * Find study groups by category, status and privacy type
      */
     @Query("SELECT sg FROM StudyGroup sg WHERE sg.category = :category AND sg.status = :status AND sg.isPrivate = :isPrivate")
-    List<StudyGroup> findByCategoryAndStatusAndPrivacyType(@Param("category") String category, @Param("status") GroupStatus status, @Param("isPrivate") boolean isPrivate, org.springframework.data.domain.Pageable pageable);
+    Page<StudyGroup> findByCategoryAndStatusAndPrivacyType(@Param("category") String category, @Param("status") StudyGroup.GroupStatus status, @Param("isPrivate") boolean isPrivate, org.springframework.data.domain.Pageable pageable);
 
     /**
      * Find study groups by status and privacy type
      */
     @Query("SELECT sg FROM StudyGroup sg WHERE sg.status = :status AND sg.isPrivate = :isPrivate")
-    List<StudyGroup> findByStatusAndPrivacyType(@Param("status") GroupStatus status, @Param("isPrivate") boolean isPrivate, org.springframework.data.domain.Pageable pageable);
+    Page<StudyGroup> findByStatusAndPrivacyType(@Param("status") StudyGroup.GroupStatus status, @Param("isPrivate") boolean isPrivate, org.springframework.data.domain.Pageable pageable);
 
     /**
      * Find featured study groups by status ordered by member count
      */
     @Query("SELECT sg FROM StudyGroup sg WHERE sg.isFeatured = true AND sg.status = :status ORDER BY sg.currentMembers DESC")
-    List<StudyGroup> findByIsFeaturedTrueAndStatusOrderByMemberCountDesc(@Param("status") GroupStatus status);
+    List<StudyGroup> findByIsFeaturedTrueAndStatusOrderByMemberCountDesc(@Param("status") StudyGroup.GroupStatus status);
 }

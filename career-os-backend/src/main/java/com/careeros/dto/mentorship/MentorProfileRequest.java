@@ -23,4 +23,6 @@ public class MentorProfileRequest {
     private String linkedinUrl;
     private String githubUrl;
     private String portfolioUrl;
+    private Integer availableHoursPerWeek;
+    private List<String> languages;
 }

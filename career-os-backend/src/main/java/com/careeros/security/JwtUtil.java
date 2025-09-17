@@ -81,7 +81,7 @@ public class JwtUtil {
      * Get user ID from JWT token
      */
     public String getUserIdFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
+        Claims claims = Jwts.parser()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
@@ -94,7 +94,7 @@ public class JwtUtil {
      * Get username from JWT token
      */
     public String getUsernameFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
+        Claims claims = Jwts.parser()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
@@ -107,7 +107,7 @@ public class JwtUtil {
      * Get token expiration date
      */
     public Date getExpirationDateFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
+        Claims claims = Jwts.parser()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
@@ -121,10 +121,10 @@ public class JwtUtil {
      */
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token);
+            Jwts.parser()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token);
             return true;
         } catch (MalformedJwtException ex) {
             logger.error("Invalid JWT token: {}", ex.getMessage());
@@ -168,7 +168,7 @@ public class JwtUtil {
      * Extract all claims from token
      */
     public Claims getAllClaimsFromToken(String token) {
-        return Jwts.parserBuilder()
+        return Jwts.parser()
                 .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)

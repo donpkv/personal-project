@@ -20,5 +20,5 @@ public class CreateStudyGroupRequest {
     private String timezone;
     private String privacyType;
     private String coverImageUrl;
-    private String rules;
+    private List<String> rules;
 }

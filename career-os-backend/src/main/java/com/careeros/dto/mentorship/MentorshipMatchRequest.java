@@ -19,4 +19,5 @@ public class MentorshipMatchRequest {
     private Integer maxResults = 10;
     private String learningGoals;
     private String communicationPreference;
+    private List<String> goals;
 }

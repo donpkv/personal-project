@@ -296,4 +296,10 @@ public interface JobPostingRepository extends JpaRepository<JobPosting, UUID> {
      */
     @Query("SELECT jp.title, COUNT(jp) as jobCount FROM JobPosting jp WHERE EXISTS (SELECT s FROM jp.requiredSkills s WHERE s IN :skills) AND jp.postedDate >= :since GROUP BY jp.title ORDER BY jobCount DESC")
     List<Object[]> getTrendingRolesForSkills(@Param("skills") List<String> skills, @Param("since") LocalDateTime since);
+    
+    /**
+     * Get top skills for a role
+     */
+    @Query(value = "SELECT skill, COUNT(*) as count FROM job_posting_required_skills jprs JOIN job_posting jp ON jprs.job_posting_id = jp.id WHERE jp.title ILIKE CONCAT('%', :role, '%') AND jp.is_active = true GROUP BY skill ORDER BY count DESC LIMIT :limit", nativeQuery = true)
+    List<Object[]> getTopSkillsForRole(@Param("role") String role, @Param("limit") int limit);
 }

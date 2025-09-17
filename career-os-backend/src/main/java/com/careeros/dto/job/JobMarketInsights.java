@@ -25,4 +25,5 @@ public class JobMarketInsights {
     private Integer remoteJobCount;
     private Double growthRate;
     private String marketTrend;
+    private double remoteWorkPercentage;
 }

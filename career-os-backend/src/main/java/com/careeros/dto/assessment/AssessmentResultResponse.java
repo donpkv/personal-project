@@ -22,6 +22,9 @@ public class AssessmentResultResponse {
     private List<String> recommendations;
     private String certificateUrl;
     private boolean passed;
+    private Integer scorePercentage;
+    private List<String> weaknesses;
+    private Boolean certificateIssued;
     
     // Getters and setters
     public UUID getAssessmentId() { return assessmentId; }
@@ -65,4 +68,13 @@ public class AssessmentResultResponse {
     
     public boolean isPassed() { return passed; }
     public void setPassed(boolean passed) { this.passed = passed; }
+    
+    public Integer getScorePercentage() { return scorePercentage; }
+    public void setScorePercentage(Integer scorePercentage) { this.scorePercentage = scorePercentage; }
+    
+    public List<String> getWeaknesses() { return weaknesses; }
+    public void setWeaknesses(List<String> weaknesses) { this.weaknesses = weaknesses; }
+    
+    public Boolean getCertificateIssued() { return certificateIssued; }
+    public void setCertificateIssued(Boolean certificateIssued) { this.certificateIssued = certificateIssued; }
 }

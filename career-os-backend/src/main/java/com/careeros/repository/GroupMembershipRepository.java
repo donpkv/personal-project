@@ -172,7 +172,7 @@ public interface GroupMembershipRepository extends JpaRepository<GroupMembership
     /**
      * Find membership by study group and user
      */
-    GroupMembership findByStudyGroupAndUser(com.careeros.entity.StudyGroup studyGroup, com.careeros.entity.User user);
+    Optional<GroupMembership> findByStudyGroupAndUser(com.careeros.entity.StudyGroup studyGroup, com.careeros.entity.User user);
 
     /**
      * Count active members in a time period
@@ -183,7 +183,7 @@ public interface GroupMembershipRepository extends JpaRepository<GroupMembership
     /**
      * Find memberships by user ID and status
      */
-    List<GroupMembership> findByUserIdAndStatus(UUID userId, MembershipStatus status);
+    List<GroupMembership> findByUserIdAndStatus(UUID userId, GroupMembership.MembershipStatus status);
 
     /**
      * Find memberships by study group ID ordered by contribution score

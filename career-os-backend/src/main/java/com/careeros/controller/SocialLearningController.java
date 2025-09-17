@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Social Learning REST Controller for study groups and peer collaboration
+ * Social Learning REST Controller for study groups and peer collaboration 
  */
 @RestController
 @RequestMapping("/api/v1/social")

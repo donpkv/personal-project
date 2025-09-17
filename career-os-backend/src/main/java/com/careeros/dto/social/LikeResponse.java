@@ -1,7 +1,7 @@
 package com.careeros.dto.social;
 
 /**
- * DTO for like response
+ * DTO for like response 
  */
 public class LikeResponse {
     private boolean liked;

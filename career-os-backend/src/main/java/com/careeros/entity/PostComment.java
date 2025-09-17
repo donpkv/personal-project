@@ -50,7 +50,7 @@ public class PostComment extends BaseEntity {
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CommentLike> likes = new HashSet<>();
 
-    // Constructors
+    // Constructors 
     public PostComment() {}
 
     public PostComment(GroupPost post, User author, String content) {

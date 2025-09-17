@@ -97,7 +97,7 @@ public class StudyGroup extends BaseEntity {
     @OneToMany(mappedBy = "studyGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<GroupChallenge> challenges = new HashSet<>();
 
-    // Enums
+    // Enums 
     public enum GroupCategory {
         PROGRAMMING,
         WEB_DEVELOPMENT,
